@@ -1,0 +1,68 @@
+@prefix xk: <http://vorlon/xk#> .
+@prefix xs: <http://www.w3.org/2001/XMLSchema#> .
+@prefix err: <http://www.w3.org/2005/xqt-errors#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix fn: <http://www.w3.org/2005/xpath-functions#> .
+<http://www.franz.com/simple#vertebrate> rdfs:subClassOf <http://www.franz.com/simple#animal> . 
+<http://www.franz.com/simple#bird> rdfs:subClassOf <http://www.franz.com/simple#vertebrate> ; 
+  <http://www.franz.com/simple#eats> <http://www.franz.com/simple#seeds> . 
+<http://www.franz.com/simple#seeds> rdfs:comment "Seeds can turn into plants if nobody eats them first." . 
+<http://www.franz.com/simple#Dark-EyedJunco> rdfs:subClassOf <http://www.franz.com/simple#bird> . 
+<http://www.franz.com/simple#reptile> rdfs:subClassOf <http://www.franz.com/simple#vertebrate> . 
+<http://www.franz.com/simple#WesternFenceLizard> rdfs:subClassOf <http://www.franz.com/simple#reptile> ; 
+  <http://www.franz.com/simple#eats> <http://www.franz.com/simple#insect> , 
+  <http://www.franz.com/simple#spider> . 
+<http://www.franz.com/simple#tick> <http://www.franz.com/simple#eatsBloodOf> <http://www.franz.com/simple#WesternFenceLizard> . 
+<http://www.franz.com/simple#invertebrate> rdfs:subClassOf <http://www.franz.com/simple#animal> . 
+<http://www.franz.com/simple#mammal> rdfs:subClassOf <http://www.franz.com/simple#vertebrate> . 
+<http://www.franz.com/simple#ruminant> rdfs:subClassOf <http://www.franz.com/simple#mammal> . 
+<http://www.franz.com/simple#cow> rdfs:subClassOf <http://www.franz.com/simple#ruminant> . 
+<http://www.franz.com/simple#Bessie> rdf:type <http://www.franz.com/simple#cow> . 
+<http://www.franz.com/simple#Hathor> rdf:type <http://www.franz.com/simple#cow> . 
+<http://www.franz.com/simple#cow> <http://www.franz.com/simple#eats> <http://www.franz.com/simple#grass> . 
+<http://www.franz.com/simple#primate> rdfs:subClassOf <http://www.franz.com/simple#mammal> . 
+<http://www.franz.com/simple#human> rdfs:subClassOf <http://www.franz.com/simple#primate> . 
+<http://www.franz.com/simple#MisterRogers> rdf:type <http://www.franz.com/simple#human> . 
+<http://www.franz.com/simple#Hypatia> rdf:type <http://www.franz.com/simple#human> . 
+<http://www.franz.com/simple#GhengisKhan> rdf:type <http://www.franz.com/simple#human> . 
+<http://www.franz.com/simple#human> <http://www.franz.com/simple#eats> <http://www.franz.com/simple#cow> , 
+    <http://www.franz.com/simple#crab> , 
+    <http://www.franz.com/simple#leaves> , 
+    <http://www.franz.com/simple#seeds> , 
+    <http://www.franz.com/simple#fruit> . 
+<http://www.franz.com/simple#gorilla> rdfs:subClassOf <http://www.franz.com/simple#primate> ; 
+  <http://www.franz.com/simple#eats> <http://www.franz.com/simple#fruit> , 
+  <http://www.franz.com/simple#leaves> , 
+  <http://www.franz.com/simple#seeds> . 
+<http://www.franz.com/simple#deer> rdfs:subClassOf <http://www.franz.com/simple#ruminant> ; 
+  <http://www.franz.com/simple#eats> <http://www.franz.com/simple#grass> , 
+  <http://www.franz.com/simple#leaves> , 
+  <http://www.franz.com/simple#rose> . 
+<http://www.franz.com/simple#lion> rdfs:subClassOf <http://www.franz.com/simple#mammal> ; 
+  rdfs:comment "Lions are fast scary animals that should stay far away." ; 
+  <http://www.franz.com/simple#eats> <http://www.franz.com/simple#human> , 
+  <http://www.franz.com/simple#deer> . 
+<http://www.franz.com/simple#arthropod> rdfs:subClassOf <http://www.franz.com/simple#invertebrate> . 
+<http://www.franz.com/simple#arachnid> rdfs:subClassOf <http://www.franz.com/simple#arthropod> . 
+<http://www.franz.com/simple#spider> rdfs:subClassOf <http://www.franz.com/simple#arachnid> . 
+<http://www.franz.com/simple#Charlotte> rdf:type <http://www.franz.com/simple#spider> . 
+<http://www.franz.com/simple#Shelob> rdf:type <http://www.franz.com/simple#spider> . 
+<http://www.franz.com/simple#spider> <http://www.franz.com/simple#eats> <http://www.franz.com/simple#insect> . 
+<http://www.franz.com/simple#tick> rdfs:subClassOf <http://www.franz.com/simple#arachnid> ; 
+  <http://www.franz.com/simple#eatsBloodOf> <http://www.franz.com/simple#human> . 
+<http://www.franz.com/simple#insect> rdfs:subClassOf <http://www.franz.com/simple#arthropod> . 
+<http://www.franz.com/simple#mollusc> rdfs:subClassOf <http://www.franz.com/simple#invertebrate> . 
+<http://www.franz.com/simple#octopus> rdfs:subClassOf <http://www.franz.com/simple#mollusc> . 
+<http://www.franz.com/simple#human> <http://www.franz.com/simple#eats> <http://www.franz.com/simple#octopus> . 
+<http://www.franz.com/simple#crustacean> rdfs:subClassOf <http://www.franz.com/simple#arthropod> . 
+<http://www.franz.com/simple#octopus> <http://www.franz.com/simple#eats> <http://www.franz.com/simple#crab> . 
+<http://www.franz.com/simple#fish> rdfs:subClassOf <http://www.franz.com/simple#vertebrate> ; 
+  <http://www.franz.com/simple#eats> <http://www.franz.com/simple#plankton> , 
+  <http://www.franz.com/simple#fish> . 
+<http://www.franz.com/simple#crab> rdfs:subClassOf <http://www.franz.com/simple#crustacean> ; 
+  <http://www.franz.com/simple#eats> <http://www.franz.com/simple#fish> , 
+  <http://www.franz.com/simple#plankton> . 
+<http://www.franz.com/simple#worm> rdfs:subClassOf <http://www.franz.com/simple#invertebrate> . 
+<http://www.franz.com/simple#bird> <http://www.franz.com/simple#eats> <http://www.franz.com/simple#worm> . 
