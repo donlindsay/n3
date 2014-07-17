@@ -1,344 +1,215 @@
-* startup
-
+* org-n3-functions
+  rdf, owl2 and n3 support for org-mode
+** startup 
 #+startup:  overview hideblocks
-
-** drawers
-
+*** drawers
 #+drawer:   hidden state properties owl2-rdfs org-n3 n3
-
-** tags 
-
+*** tags 
 #+tags:     { @file @buffer @window @frame } 
 #+tags:     { @doc @src @lob } 
 #+tags:     { @import @export @org-n3 }
-#+tags:     org elisp n3 owl2 rdfs prolog lisp shell axiom
-
-** header-args
-
+#+tags:     org elisp n3 owl2 rdfs shell axiom
+*** header-args
 #+property: header-args         :export results
 #+property: header-args:org-n3  :session *org-n3*
+*** properties 
+    :properties:
+    :see-also org-property-allowed-value-functions
+    :end:
+**** TODO do i want a #+property: list of all owl2 and rdfs? 
+***** or elisp via org-global-properties 
 
-** properties 
-   :properties:
-   :see-also org-property-allowed-value-functions
-   :end:
-
-*** TODO do i want a #+property: list of all owl2 and rdfs? 
-    
-**** or elisp via org-global-properties
-
-     "List of property/value pairs that can be inherited by any entry.
-     This list will be combined with the constant
-     `org-global-properties-fixed'.  The entries in this list are cons
-     cells where the car is a property name and cdr is a string with the
-     value."
- 
-**** org-global-properties format
+      "List of property/value pairs that can be inherited by any entry.
+      This list will be combined with the constant
+      `org-global-properties-fixed'.  The entries in this list are cons
+      cells where the car is a property name and cdr is a string with the
+      value."
+  
+***** org-global-properties format
 
    '(("org-n3-triple-part" . "subject predicate object"))
 
-   it might make sense to make a separate file for holding the list
-   since it might be somewhat long and can be imported.
-
-   a related question is if i want to define all the owl2 and rdfs as
-   tags.
-
-   this may be where drawers will be appropriate as they are easily
-   handled, are custom definable, and have good code support.
-
-   also, the syntax of drawers is similar to n3 syntax, making the
-   production of n3 strings easier, if, for instance, i want to do
-   string replacement and filtering functions, or want to do things
-   with agenda and column views
 
 #+BEGIN_EXAMPLE owl2-rdfs property drawer
   :owl2-rdfs:
   :doc-string "owl2 and rdfs markup element drawer"
   :type drawer
   :end:
+
 #+END_EXAMPLE
 
 #+property: org-n3_all          org-n3-rdfs-type
-
 #+property: org-n3+             org-n3-predicate
 #+property: org-n3-predicate    rdfs-type
 
-**** or elisp via org-file-properties
-   
-     "You can set buffer-local values for the same purpose in the variable
-     `org-file-properties' this by adding lines like
-   
-     #+PROPERTY: NAME VALUE"
+***** or elisp via org-file-properties
+      
+      "You can set buffer-local values for the same purpose in the variable
+      `org-file-properties' this by adding lines like
+    
+      #+PROPERTY: NAME VALUE"
 
-
-** calls 
-  
+*** calls 
    "#+call [<inside header arguments>] (<arguments>) <end header arguments>"
-
 #+call: org-n3-imenu-add-to-menubar
 #+call: org-n3-button-panel
 #+call: org-n3-ac-predictive
-#+CALL: factorial(n=5)
-#+CALL: factorial[:session special](n=5)
-#+CALL: org-n3-todo-keywords (<arguments>)
-* features
+#+call: factorial(n=5)
+#+call: factorial[:session special](n=5)
+#+call: org-n3-todo-keywords (<arguments>)
 
-    mark element(s)
-    
-    convert elements from org to turtle
-
-    invoke rapper to produce ntriples buffer
-
-    mark parser errors
-
-    comment out or delete parser messages in parser output buffer
-
-    save parser buffer to .nt file
-
-    another way is to do the 'parsing' entirely in elisp, this might
-    be better, actually, maybe even easier
-
-    org-elements has a couple of variables and functions that
-    basically have done alot or most of the work, what needs to be
-    done is to read the parse tree and output the result of the read
-    in ntriples. it may be easier to simply output in ntriples than
-    going for an intermediate step of using turtle.
-
-    there are a couple different things to consider. first, how
-    sophisticated to i need the outputted file to be? it will be
-    better to start with simple output, like property lists and
-    rdfs:type declarations to begin with than to try and capture all
-    of the owl and rdf elements at once
-
-    an interesting consequence is that its probably that i wont have
-    all the rdfs and owl compliant predicates ready for direct
-    translation to begin with. this may mean an ongoing process where
-    rdfs and owl ready translations are elicited as i go.
-
-    for instance, say i have a headline with two subheadlines, each
-    with a body of text and a property list. the subheadlines might be
-    properties and the text bodies of the subheadlines might be
-    properties of properties. this doesnt seem to jibe very well with
-    the way org-elements is currently designed because the
-    subheadlines have property lists already under the :properties:
-    symbols. this might not be an issue, however, if i treat the text
-    as just another property. however, this might not be such a good
-    idea because the point of conversion to .nt is to capture (subject
-    predicate object) relationships.
-
-    property drawers with rdfs and owl compliant property values will
-    be helpful in creating the correct ntriples for an element and can
-    be made a part of the .org file.
-
-    preparing the .org file
-
-    basically there will be two types of predicate sources to work
-    with:
-    first, this predicate sources that derive from the structure of
-    org-elements. these are the predicates that derive from the way an
-    org document is structured and do not depend on user designated
-    property lists
-    second, are user designated property lists introduced
-    with :properties:
-
-    there will be alot of stuff that's in the org-element parse tree
-    that i really am not going to want in the .nt file, that
-    represents stuff for org internals and emacs specific use that im
-    not going to want cluttering things up. therefor my default
-    strategy is going to be basically picking out some specific things
-    that i want to capture to triples and ignoring the rest
-
-    a way to do start doing this is with a simple interactive function
-    that does one thing, creates a triple from a headline element,
-    consing onto each element the appropriate URI information.
-
-    where a turtle or n3 stage might be useful here, and why i might
-    want to resort to an external parser, is the readability of the
-    output of my 'triplize' function while im working. if i do it with
-    eval and print then its going to output a ntriple that will most
-    likely run right off the end of the screen and making it less
-    readable.
-
-    as a stage, will it be a big deal if im producing turtle notation
-    that i can process with raptor, or some other parser/printer?
-    surely not, although i eventually want to be producing ntriples
-    for gruff, or at least until i can get a 64bit laptop so i can run
-    later versions of gruff that can read more file formats.
-
-    ergo, i can create some source blocks
-
-    first, i want to eval and print the org-elements parse tree
-
-#+BEGIN_SRC emacs-lisp :results output
-(require 'ox)
-
-
-#+END_SRC
-
-#+RESULTS:
-
-#+BEGIN_SRC emacs-lisp :results output
-(let ((oem (org-element-map))
-        (oem 'org-element-map)
-;    (print (format "%s %f" "OEM: " (eval org-element-map)))
-    (print (format "%s %d" "OEM: " (eval org-element-map) nil)
-    (print "End of org-element-map"))
-#+end_src
-
-#+name:
-: 
-: "Dog:  1.414214"
-: 
-: "Cat:  7"
-: 
-: "Fish."
-* import to org
-** TODO raptor functions
-*** this is a start
+* features 
+** property and tag support for n3 (owl2/rdf)
+** import n3/ttl files to org
+** export org to n3/ttl
+* utilities 							      :shell:
+** cwm
+** raptor 
+*** functions 
+**** this is a start 
 #+NAME: raptor
 #+BEGIN_SRC sh :var filename=(buffer-file-name) :exports both
        rapper -i turtle -o ntriples $filename
 #+END_SRC
-*** raptor							 :rdf:parser:
-**** man raptor
-***** Raptor RDF Syntax Library - Raptor RDF parser utility	 :rdf:raptor:
-****** NAME
-       rapper − Raptor RDF parsing and serializing utility
+*** man raptor
+**** Raptor RDF Syntax Library - Raptor RDF parser utility	 :rdf:raptor:
+***** NAME
+      rapper − Raptor RDF parsing and serializing utility
 
-****** SYNOPSIS
-       rapper [OPTIONS] INPUT-URI [INPUT-BASE-URI]
+***** SYNOPSIS
+      rapper [OPTIONS] INPUT-URI [INPUT-BASE-URI]
 
-****** EXAMPLE
-       rapper -o ntriples http://planetrdf.com/guide/rss.rdf
-       rapper -i rss-tag-soup -o rss-1.0 pile-of-rss.xml
-	    http://example.org/base/ 
-       rapper --count http://example.org/index.rdf
+***** EXAMPLE
+      rapper -o ntriples http://planetrdf.com/guide/rss.rdf
+      rapper -i rss-tag-soup -o rss-1.0 pile-of-rss.xml
+	   http://example.org/base/ 
+      rapper --count http://example.org/index.rdf
 
-****** DESCRIPTION
-       The rapper utility allows parsing of RDF content by the
-       Raptor RDF parser toolkit emitting the results as RDF
-       triples in a choice of syntaxes. The INPUT-URI can be a
-       file name, ’-’ for standard input or if Raptor is built
-       with a WWW retrieval library, a general URI. The optional
-       INPUT-BASE-URI is used as the document parser base URI if
-       present otherwise defaults to the INPUT-URI. A value of
-       ’-’ means no base URI.
+***** DESCRIPTION
+      The rapper utility allows parsing of RDF content by the
+      Raptor RDF parser toolkit emitting the results as RDF
+      triples in a choice of syntaxes. The INPUT-URI can be a
+      file name, ’-’ for standard input or if Raptor is built
+      with a WWW retrieval library, a general URI. The optional
+      INPUT-BASE-URI is used as the document parser base URI if
+      present otherwise defaults to the INPUT-URI. A value of
+      ’-’ means no base URI.
 
-****** OPTIONS
-       rapper uses the usual GNU command line syntax, with long
-       options starting with two dashes (’-’) if supported by
-       the getopt_long function. Otherwise the short options are
-       only available.
+***** OPTIONS
+      rapper uses the usual GNU command line syntax, with long
+      options starting with two dashes (’-’) if supported by
+      the getopt_long function. Otherwise the short options are
+      only available.
 
-       −h, −−help
+      −h, −−help
 
-       Show a summary of the options.
+      Show a summary of the options.
 
-       −i, −−input FORMAT
+      −i, −−input FORMAT
 
-       Set the input FORMAT to one of ’rdfxml’ (RDF/XML,
-       default), ’ntriples’ (N-Triples, see below), ’turtle’
-       (Turtle, see below) or ’rss-tag-soup’ (RSS Tag Soup). The
-       RSS Tag Soup parser can turn the many XML RSS formats and
-       Atom 0.3 into RDF triples.
+      Set the input FORMAT to one of ’rdfxml’ (RDF/XML,
+      default), ’ntriples’ (N-Triples, see below), ’turtle’
+      (Turtle, see below) or ’rss-tag-soup’ (RSS Tag Soup). The
+      RSS Tag Soup parser can turn the many XML RSS formats and
+      Atom 0.3 into RDF triples.
 
-       The list of parsers depends on how libraptor(3) was
-       built. The list of supported parsers is given in the help
-       summary given by −h.
+      The list of parsers depends on how libraptor(3) was
+      built. The list of supported parsers is given in the help
+      summary given by −h.
 
-       −I, −−input-uri URI
+      −I, −−input-uri URI
 
-       Set the input/parser base URI or use value ’-’ for no
-       base. The default is the INPUT-URI argument value.
+      Set the input/parser base URI or use value ’-’ for no
+      base. The default is the INPUT-URI argument value.
 
-       −o, −−output FORMAT
+      −o, −−output FORMAT
 
-       Set the output FORMAT to ’ntriples’ (N-Triples, default),
-       ’rdfxml’ (RDF/XML), ’rdfxml-abbrev’ (RDF/XML with
-       abbreviations) or ’rss-1.0’ (RSS 1.0, also an RDF/XML
-       syntax).
+      Set the output FORMAT to ’ntriples’ (N-Triples, default),
+      ’rdfxml’ (RDF/XML), ’rdfxml-abbrev’ (RDF/XML with
+      abbreviations) or ’rss-1.0’ (RSS 1.0, also an RDF/XML
+      syntax).
 
-       The list of serializers depends on how libraptor(3) was
-       built. The list of supported serializers is given in the
-       help summary given by −h.
+      The list of serializers depends on how libraptor(3) was
+      built. The list of supported serializers is given in the
+      help summary given by −h.
 
-       −O, −−output-uri URI
+      −O, −−output-uri URI
 
-       Set the output/serializer base URI or use value ’-’ for
-       no base. The default is the input base uri, either set by
-       the argument INPUT-BASE-URI or via options −I,
-       −−input-uri URI
+      Set the output/serializer base URI or use value ’-’ for
+      no base. The default is the input base uri, either set by
+      the argument INPUT-BASE-URI or via options −I,
+      −−input-uri URI
 
-       −c, −−count
+      −c, −−count
 
-       Only count the triples and produce no other output.
+      Only count the triples and produce no other output.
 
-       −e, −−ignore-errors
+      −e, −−ignore-errors
 
-       Ignore errors, do not emit the messages and try to
-       continue parsing.
+      Ignore errors, do not emit the messages and try to
+      continue parsing.
 
-       −f, −−feature FEATURE[=VALUE]
+      −f, −−feature FEATURE[=VALUE]
 
-       Set a parser or serializer feature FEATURE to a value, or
-       to 1 if VALUE is omitted, Use −f help to get lists of
-       valid parser and serializer features.
+      Set a parser or serializer feature FEATURE to a value, or
+      to 1 if VALUE is omitted, Use −f help to get lists of
+      valid parser and serializer features.
 
-       If the form −f ’xmlns:prefix="uri"’ is used, the prefix
-       and namespace uri given will be set for serializing. The
-       syntax matches XML in that either or both of prefix or
-       uri can be omitted.
+      If the form −f ’xmlns:prefix="uri"’ is used, the prefix
+      and namespace uri given will be set for serializing. The
+      syntax matches XML in that either or both of prefix or
+      uri can be omitted.
 
-       −g, −−guess
+      −g, −−guess
 
-       Guess the parser to use from the source-URI rather than
-       use the −i FORMAT.
+      Guess the parser to use from the source-URI rather than
+      use the −i FORMAT.
 
-       −q, −−quiet
+      −q, −−quiet
 
-       No extra information messages.
+      No extra information messages.
 
-       −r, −−replace-newlines
+      −r, −−replace-newlines
 
-       Replace newlines in multi-line literals with spaces.
+      Replace newlines in multi-line literals with spaces.
 
-       −−show-graphs
+      −−show-graphs
 
-       Print graph names (URIs) as they are seen in the input. This only has
-       a meaning for parsers that support graph names such as the TRiG
-       parser.
+      Print graph names (URIs) as they are seen in the input. This only has
+      a meaning for parsers that support graph names such as the TRiG
+      parser.
 
-       −−show-namespaces
+      −−show-namespaces
 
-       Print namespaces as they are seen in the input.
+      Print namespaces as they are seen in the input.
 
-       −t, −−trace
+      −t, −−trace
 
-       Print URIs retrieved during parsing. Especially useful
-       for monitoring what the guess and GRDDL parsers are
-       doing.
+      Print URIs retrieved during parsing. Especially useful
+      for monitoring what the guess and GRDDL parsers are
+      doing.
 
-       −w, −−ignore-warnings
+      −w, −−ignore-warnings
 
-       Ignore warnings, do not emit the messages.
+      Ignore warnings, do not emit the messages.
 
-       −v, −−version
+      −v, −−version
 
-       Print the raptor version and exit.  
+      Print the raptor version and exit.  
 
-****** EXAMPLES
+***** EXAMPLES
 
-       rapper -q -i ntriples -o rdfxml 
-       -f ’xmlns:rss="http://purl.org/rss/1.0/"’ 
-       -f ’xmlns:ex="http://example.org/"’ 
-	  tests/test.nt
+      rapper -q -i ntriples -o rdfxml 
+      -f ’xmlns:rss="http://purl.org/rss/1.0/"’ 
+      -f ’xmlns:ex="http://example.org/"’ 
+	 tests/test.nt
 
-       rapper -q -o rdfxml 
-       -f ’xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"’ 
-	  tests/rdf-schema.rdf 
-	  ’http://www.w3.org/2000/01/rdf-schema#’
+      rapper -q -o rdfxml 
+      -f ’xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"’ 
+	 tests/rdf-schema.rdf 
+	 ’http://www.w3.org/2000/01/rdf-schema#’
 
-****** Examples
+***** Examples
      rapper -q -i ntriples -o rdfxml 
 	    -f ’xmlns:rss="http://purl.org/rss/1.0/"’
 	    -f ’xmlns:ex="http://example.org/"’ tests/test.nt
@@ -354,32 +225,7 @@
 (insert results at point)
 (append-results-to-buffer-or-file)
 #+end_src
-
-** third-party content security issues				     :import:
-
-   Captured [2014-05-30 Fri 14:54]
-   Title: Complexity as the Enemy of Security
-   Date: Tue, 27 May 2014 10:27:12 PDT
-   Feed: Krebs on Security
-   Link: http://krebsonsecurity.co[...]as-the-enemy-of-security/
-  
-   Late last month, hackers allied with the Syrian Electronic Army
-   (SEA) compromised the Web site for the RSA Conference, the world's
-   largest computer security gathering. The attack, while unremarkable
-   in many ways, illustrates the continued success of phishing attacks
-   that spoof top executives within targeted organizations. It's also
-   a textbook example of how third-party content providers can be
-   leveraged to break into high-profile Web sites.
-** exclusive-or
-#+name: exclusive-or
-#+begin_src emacs-lisp
-       (defun org-xor (a b)
-          "Exclusive or."
-          (if a (not b) b))
-#+end_src
-* export to n3
-* utilities							      :shell:
-* functions
+* functions								 :fn:
 ** org-n3-org-ac
 #+name: org-n3-org-ac
 #+BEGIN_SRC emacs-lisp
@@ -546,13 +392,8 @@ org-affiliated-keyword := org-keyword
 org-keyword            := ( :keyword   <string> [ :optional <string> ] :value <string> )
 org-attribute          := ( :attribute <string> [ :optional <string> ] :value <string> )
 #+END_EXAMPLE
-** TODO org-n3-lob-file
-** TODO do i want a #+property: list of all owl2 and rdfs? 
-
+** org-n3-lob-file
+** do i want a #+property: list of all owl2 and rdfs? 
 #+property: org-n3_all          org-n3-rdfs-type
 #+property: org-n3+             org-n3-predicate
 #+property: org-n3-predicate    rdfs-type
-
-*** drawers
-#+drawer:   hidden state
-
