@@ -1,4 +1,4 @@
-org-n3-functions
+N3
 ================
 
-N3 notation functions for emacs and org.
+N3 Notation 3 core files.
